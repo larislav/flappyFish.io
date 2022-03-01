@@ -15,19 +15,10 @@ function Barreira(reversa = false){
     }
     /*this.elemento vai adicionar na DOM
     o elemento criado chamando o metodo novoElemento*/
-    //const borda = novoElemento('div', 'borda');
-    //const corpo = novoElemento('div', 'corpo');
-    //this.elemento.appendChild(reversa ? corpo : borda);
     /*se reversa for true, adiciona primeiro o corpo
     se não, adiciona primeiro a borda*/
-    //this.elemento.appendChild(reversa ? borda : corpo);
-    /*se reversa for true, adiciona primeiro a borda
-    se não, adiciona primeiro o corpo*/
     this.setAltura = altura => this.elemento.style.height = `${altura}px`;
 }
-//const b = new Barreira(false)
-//b.setAltura(200)
-//document.querySelector('[wm-flappy]').appendChild(b.elemento)
 
 function ParDeBarreiras(altura, abertura, x){
     this.elemento = novoElemento('div', 'par-de-barreiras');
@@ -48,8 +39,6 @@ function ParDeBarreiras(altura, abertura, x){
     this.sortearAbertura()
     this.setX(x)
 }
-//const b = new ParDeBarreiras(700, 200, 400)
-//document.querySelector('[wm-flappy]').appendChild(b.elemento)
 
 function Barreiras(altura, largura, abertura, espaco, notificarPonto){
     this.pares = [
@@ -97,15 +86,28 @@ function Peixe(alturaJogo){
     this.elemento.src = 'imgs/peixe.png';
     this.getY = () => parseInt(this.elemento.style.bottom.split('px')[0]);
     this.setY = y => this.elemento.style.bottom = `${y}px`;
+    if(isMobile){
+        this.elemento.style.width = "60px"; 
+        window.ontouchstart = function(e){
+            voando = true
+            document.querySelector('.peixe').style.transform = 'rotate( ' + -5 + 'deg )'        
+        } 
+        window.ontouchend = function(e){
+            voando = false
+            document.querySelector('.peixe').style.transform = 'rotate( ' + 5 + 'deg )'
+        }
+    }
+    else{
+        window.onkeydown = function(e){
+            voando = true
+            document.querySelector('.peixe').style.transform = 'rotate( ' + -5 + 'deg )'        
+        } 
+        window.onkeyup = function(e){
+            voando = false
+            document.querySelector('.peixe').style.transform = 'rotate( ' + 5 + 'deg )'
+        } 
+    }
     
-    window.onkeydown = function(e){
-        voando = true
-        document.querySelector('.peixe').style.transform = 'rotate( ' + -5 + 'deg )'        
-    } 
-    window.onkeyup = function(e){
-        voando = false
-        document.querySelector('.peixe').style.transform = 'rotate( ' + 5 + 'deg )'
-    } 
     this.animar = () => {
         const novoY = this.getY() + (voando ? 8 : -3)
         const alturaMaxima = alturaJogo - this.elemento.clientHeight
@@ -130,17 +132,6 @@ function Progresso(){
     }
     this.atualizarPontos(0)
 }
-
-// const barreiras = new Barreiras(700, 1200, 200, 400)
-// const passaro = new Passaro(700)
-// const areaDoJogo =  document.querySelector('[wm-flappy]')
-// areaDoJogo.appendChild(passaro.elemento)
-// areaDoJogo.appendChild(new Progresso().elemento)
-// barreiras.pares.forEach(par => areaDoJogo.appendChild(par.elemento))
-// setInterval(() =>{
-//     barreiras.animar()
-//    passaro.animar()
-// }, 20)
 
 function estaoSobrepostos(elementoA, elementoB){
     const a = elementoA.getBoundingClientRect()
@@ -195,20 +186,39 @@ function FlappyFish(){
                     let placar = novoElemento('div', 'placarFinal');
                     placar.innerHTML = `Placar final: ${pontos}`;
                     areaDoJogo.appendChild(placar);
-                    $(document).one('keydown', function(e) {
-                        $('div[wm-flappy]').empty();
-                        new FlappyFish().start()
-                    }); 
+                    if(isMobile){
+                        $(document).one('touchend', function(e) {
+                            $('div[wm-flappy]').empty();
+                            new FlappyFish().start()
+                        });
+                    }
+                    else{
+                        $(document).one('keydown', function(e) {
+                            $('div[wm-flappy]').empty();
+                            new FlappyFish().start()
+                        });
+                    }
                 }
             }, 20)
         }
 }
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
 $(document).ready(function(e){
     let inicio = novoElemento('div', 'fraseInicio');
     inicio.innerHTML = `pressione qualquer tecla`;
     document.querySelector('[wm-flappy]').appendChild(inicio);
 })
-$(document).one('keyup', function(e) {
-    $('div[wm-flappy]').empty();
-    new FlappyFish().start()
-}) 
+if(isMobile){
+    $(document).one('touchend', function(e) {
+        $('div[wm-flappy]').empty();
+        new FlappyFish().start()
+    }) 
+}
+else{
+    $(document).one('keyup', function(e) {
+        $('div[wm-flappy]').empty();
+        new FlappyFish().start()
+    }) 
+}
+

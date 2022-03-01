@@ -13,8 +13,6 @@ function Barreira(reversa = false){
     else{
         this.elemento.src = 'imgs/aguaviva.png';
     }
-    /*this.elemento vai adicionar na DOM
-    o elemento criado chamando o metodo novoElemento*/
     /*se reversa for true, adiciona primeiro o corpo
     se não, adiciona primeiro a borda*/
     this.setAltura = altura => this.elemento.style.height = `${altura}px`;
